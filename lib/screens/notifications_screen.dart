@@ -29,36 +29,47 @@ class NotificationsScreen extends StatelessWidget {
       ),
 
       body: StreamBuilder(
+
         stream: FirebaseFirestore.instance
             .collection('notifications')
-            .orderBy('time', descending: true)
+            .orderBy('time',
+            descending: true)
             .snapshots(),
 
         builder: (context, snapshot) {
 
           if (!snapshot.hasData) {
+
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
 
-          final docs = snapshot.data!.docs;
+          final notifications =
+              snapshot.data!.docs;
 
           return ListView.builder(
-            itemCount: docs.length,
+
+            itemCount: notifications.length,
+
             itemBuilder: (context, index) {
 
-              final data = docs[index];
+              final data =
+              notifications[index];
 
-              return notificationTile(
+              return ListTile(
 
-                title: data['title'],
+                leading: const Icon(
+                  Icons.notifications,
+                ),
 
-                subtitle: data['time'],
+                title: Text(
+                  data['title'],
+                ),
 
-                icon: Icons.notifications_active,
-
-                color: Colors.orange,
+                subtitle: Text(
+                  data['message'],
+                ),
               );
             },
           );

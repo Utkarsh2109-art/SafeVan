@@ -12,6 +12,23 @@ class TrackingScreen extends StatefulWidget {
 class _TrackingScreenState extends State<TrackingScreen> {
   GoogleMapController? mapController;
 
+  LatLng? currentVanLocation;
+
+  String eta = "Calculating...";
+
+  void updateCamera(LatLng location) {
+
+    mapController?.animateCamera(
+      CameraUpdate.newCameraPosition(
+
+        CameraPosition(
+          target: location,
+          zoom: 16,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,7 +42,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
           borderRadius: BorderRadius.circular(20),
         ),
 
-        child: const Column(
+        child:  Column(
           mainAxisSize: MainAxisSize.min,
 
           children: [
@@ -46,7 +63,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
             SizedBox(height: 5),
 
             Text(
-              "ETA: 8 mins",
+              "ETA: $eta",
 
               style: TextStyle(
                 color: Colors.greenAccent,
@@ -92,11 +109,22 @@ class _TrackingScreenState extends State<TrackingScreen> {
             );
           }
 
-          final LatLng vanLocation = LatLng(
-            (data.data()?['lat'] ?? 28.6139).toDouble(),
+          final double lat =
+          (data.data()?['lat'] ?? 28.6139).toDouble();
 
-            (data.data()?['lng'] ?? 77.2090).toDouble(),
-          );
+          final double lng =
+          (data.data()?['lng'] ?? 77.2090).toDouble();
+
+          final LatLng vanLocation = LatLng(lat, lng);
+
+          currentVanLocation = vanLocation;
+
+          eta = "${5 + DateTime.now().second % 6} mins";
+
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+
+            updateCamera(vanLocation);
+          });
 
           return GoogleMap(
             mapType: MapType.normal,
@@ -112,16 +140,18 @@ class _TrackingScreenState extends State<TrackingScreen> {
 
                 position: vanLocation,
 
-                infoWindow: const InfoWindow(title: "School Van"),
+                infoWindow: const InfoWindow(
+                  title: "SafeVan",
+                  snippet: "Driver Live Location",
+                ),
               ),
             },
 
             onMapCreated: (controller) {
+
               mapController = controller;
 
-              controller.animateCamera(
-                CameraUpdate.newLatLngZoom(vanLocation, 15),
-              );
+              updateCamera(vanLocation);
             },
           );
         },

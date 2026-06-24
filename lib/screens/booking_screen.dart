@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import '../services/firestore_service.dart';
 import '../services/payment_service.dart';
 
@@ -14,9 +14,50 @@ class BookingScreen extends StatefulWidget {
 
 class _BookingScreenState
     extends State<BookingScreen> {
+  final pickupController =
+  TextEditingController();
+
+  final dropController =
+  TextEditingController();
+
+  final childController =
+  TextEditingController();
+
+  String userName = "";
 
   final FirestoreService firestoreService =
   FirestoreService();
+
+  @override
+  void initState() {
+
+    super.initState();
+
+    loadUserData();
+  }
+
+  Future<void> loadUserData() async {
+
+    final user =
+        FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+
+      final doc =
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      if (doc.exists) {
+
+        setState(() {
+
+          userName = doc['name'];
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +84,75 @@ class _BookingScreenState
 
         child: Column(
           children: [
+
+            TextField(
+
+              controller: childController,
+
+              decoration: InputDecoration(
+
+                hintText: "Student Name",
+
+                filled: true,
+
+                fillColor: Colors.grey.shade100,
+
+                border: OutlineInputBorder(
+                  borderRadius:
+                  BorderRadius.circular(18),
+
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 15),
+
+            TextField(
+
+              controller: pickupController,
+
+              decoration: InputDecoration(
+
+                hintText: "Pickup Location",
+
+                filled: true,
+
+                fillColor: Colors.grey.shade100,
+
+                border: OutlineInputBorder(
+                  borderRadius:
+                  BorderRadius.circular(18),
+
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 15),
+
+            TextField(
+
+              controller: dropController,
+
+              decoration: InputDecoration(
+
+                hintText: "Drop Location",
+
+                filled: true,
+
+                fillColor: Colors.grey.shade100,
+
+                border: OutlineInputBorder(
+                  borderRadius:
+                  BorderRadius.circular(18),
+
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
 
             bookingCard(
               "van1",
@@ -145,10 +255,36 @@ class _BookingScreenState
               ElevatedButton(
 
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.yellow,
+                  backgroundColor: Colors.black,
+
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 14,
+                  ),
+
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
 
                 onPressed: () async {
+
+                  if (childController.text.isEmpty ||
+                      pickupController.text.isEmpty ||
+                      dropController.text.isEmpty) {
+
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(
+
+                      const SnackBar(
+                        content: Text(
+                          "Fill all fields",
+                        ),
+                      ),
+                    );
+
+                    return;
+                  }
 
                   if (seats <= 0) {
 
@@ -182,9 +318,17 @@ class _BookingScreenState
 
                       await firestoreService
                           .addBooking(
+                        studentName:
+                        childController.text.trim(),
 
-                        parentName:
-                        "Utkarsh Sinha",
+                        pickupLocation:
+                        pickupController.text.trim(),
+
+                        dropLocation:
+                        dropController.text.trim(),
+
+                        parentName: userName,
+
 
                         vanNumber: vanName,
                       );
@@ -203,6 +347,11 @@ class _BookingScreenState
                       }
                     },
                   );
+                  childController.clear();
+
+                  pickupController.clear();
+
+                  dropController.clear();
 
                   payment.openCheckout();
                 },
@@ -211,7 +360,7 @@ class _BookingScreenState
                   "Book",
 
                   style: TextStyle(
-                    color: Colors.black,
+                    color: Colors.white,
                   ),
                 ),
               ),

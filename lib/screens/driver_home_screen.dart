@@ -8,6 +8,7 @@ import 'package:geolocator/geolocator.dart';
 import 'attendance_screen.dart';
 import 'package:geocoding/geocoding.dart';
 
+
 class DriverHomeScreen extends StatefulWidget {
   const DriverHomeScreen({super.key});
 
@@ -18,6 +19,54 @@ class DriverHomeScreen extends StatefulWidget {
 
 
 class _DriverHomeScreenState extends State<DriverHomeScreen> {
+
+  Future<void> startLiveLocation() async {
+
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled =
+    await Geolocator.isLocationServiceEnabled();
+
+    if (!serviceEnabled) {
+      return;
+    }
+
+    permission =
+    await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied) {
+
+      permission =
+      await Geolocator.requestPermission();
+    }
+
+    Geolocator.getPositionStream(
+
+      locationSettings:
+      const LocationSettings(
+
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 10,
+      ),
+    ).listen((Position position) async {
+
+      await FirebaseFirestore.instance
+          .collection('driverLocation')
+          .doc('driver1')
+          .set({
+
+        'lat': position.latitude,
+        'lng': position.longitude,
+      });
+
+      print(
+        "LIVE LOCATION UPDATED",
+      );
+    });
+  }
+
+
 
   int currentIndex = 0;
 
@@ -50,8 +99,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
   @override
   void initState() {
     super.initState();
-
-    startLiveTracking();
+    startLiveLocation();
 
     getLiveAddress();
   }
@@ -824,7 +872,13 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
               .add({
 
             'title': 'Emergency Alert',
-            'time': 'Driver sent emergency alert',
+
+            'message':
+            'Driver sent emergency alert',
+
+            'time': DateTime.now(),
+
+            'type': 'emergency',
           });
 
           ScaffoldMessenger.of(context)

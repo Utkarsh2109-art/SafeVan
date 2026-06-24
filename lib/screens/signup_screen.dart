@@ -32,6 +32,24 @@ class _SignupScreenState
   passwordController =
   TextEditingController();
 
+  final TextEditingController phoneController =
+  TextEditingController();
+
+  final TextEditingController childNameController =
+  TextEditingController();
+
+  final TextEditingController childClassController =
+  TextEditingController();
+
+  final TextEditingController vanNumberController =
+  TextEditingController();
+
+  final TextEditingController licenseController =
+  TextEditingController();
+
+  final TextEditingController routeController =
+  TextEditingController();
+
   String selectedRole = "Parent";
 
   bool isLoading = false;
@@ -203,6 +221,191 @@ class _SignupScreenState
               ),
 
               const SizedBox(height: 30),
+              if (selectedRole == "Parent") ...[
+
+                const SizedBox(height: 15),
+
+                TextField(
+                  controller: phoneController,
+                  decoration: const InputDecoration(
+                    hintText: "Phone Number",
+                  ),
+                ),
+
+                const SizedBox(height: 15),
+
+                Container(
+
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 18,
+                  ),
+
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+
+                  child: TextField(
+
+                    controller: childNameController,
+
+                    decoration: const InputDecoration(
+
+                      border: InputBorder.none,
+
+                      hintText: "Child Name",
+
+                      icon: Icon(Icons.child_care),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 15),
+
+        Container(
+
+          padding: const EdgeInsets.symmetric(
+            horizontal: 18,
+          ),
+
+          decoration: BoxDecoration(
+            color: Colors.grey.shade100,
+            borderRadius: BorderRadius.circular(18),
+          ),
+
+          child: TextField(
+
+            controller: childClassController,
+
+            decoration: const InputDecoration(
+
+              border: InputBorder.none,
+
+              hintText: "Child Class",
+
+              icon: Icon(Icons.school),
+
+            ),
+          ),
+        ),
+              ],
+
+              if (selectedRole == "Driver") ...[
+
+                const SizedBox(height: 15),
+
+                Container(
+
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 18,
+                  ),
+
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+
+                  child: TextField(
+
+                    controller: phoneController,
+
+                    keyboardType: TextInputType.phone,
+
+                    decoration: const InputDecoration(
+
+                      border: InputBorder.none,
+
+                      hintText: "Phone Number",
+
+                      icon: Icon(Icons.phone),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 15),
+
+    Container(
+
+    padding: const EdgeInsets.symmetric(
+    horizontal: 18,
+    ),
+
+    decoration: BoxDecoration(
+    color: Colors.grey.shade100,
+    borderRadius: BorderRadius.circular(18),
+    ),
+
+    child: TextField(
+
+    controller: vanNumberController,
+
+    decoration: const InputDecoration(
+
+    border: InputBorder.none,
+
+    hintText: "Van Number",
+
+    icon: Icon(Icons.directions_bus),
+    ),
+    ),
+    ),
+
+                const SizedBox(height: 15),
+
+    Container(
+
+    padding: const EdgeInsets.symmetric(
+    horizontal: 18,
+    ),
+
+    decoration: BoxDecoration(
+    color: Colors.grey.shade100,
+    borderRadius: BorderRadius.circular(18),
+    ),
+
+    child: TextField(
+
+    controller: licenseController,
+
+    decoration: const InputDecoration(
+
+    border: InputBorder.none,
+
+    hintText: "License Number",
+
+    icon: Icon(Icons.badge),
+    ),
+    ),
+    ),
+
+                const SizedBox(height: 15),
+
+    Container(
+
+    padding: const EdgeInsets.symmetric(
+    horizontal: 18,
+    ),
+
+    decoration: BoxDecoration(
+    color: Colors.grey.shade100,
+    borderRadius: BorderRadius.circular(18),
+    ),
+
+    child: TextField(
+
+    controller: routeController,
+
+    decoration: const InputDecoration(
+
+    border: InputBorder.none,
+
+    hintText: "Route",
+
+    icon: Icon(Icons.route),
+    ),
+    ),
+    ),
+              ],
 
               const Text(
 
@@ -405,6 +608,55 @@ class _SignupScreenState
 
                   onPressed: () async {
 
+                    if (nameController.text.isEmpty ||
+                        emailController.text.isEmpty ||
+                        passwordController.text.isEmpty) {
+
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(
+
+                        const SnackBar(
+                          content: Text(
+                            "Please fill all required fields",
+                          ),
+                        ),
+                      );
+
+                      return;
+                    }
+
+                    if (selectedRole == "Driver" &&
+                        vanNumberController.text.isEmpty) {
+
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(
+
+                        const SnackBar(
+                          content: Text(
+                            "Enter van number",
+                          ),
+                        ),
+                      );
+
+                      return;
+                    }
+
+                    if (selectedRole == "Parent" &&
+                        childNameController.text.isEmpty) {
+
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(
+
+                        const SnackBar(
+                          content: Text(
+                            "Enter child name",
+                          ),
+                        ),
+                      );
+
+                      return;
+                    }
+
                     try {
 
                       setState(() {
@@ -436,6 +688,34 @@ class _SignupScreenState
 
                         'role':
                         selectedRole,
+
+                        'phone':
+                        phoneController.text.trim(),
+
+                        'vanNumber':
+                        selectedRole == "Driver"
+                            ? vanNumberController.text.trim()
+                            : "",
+
+                        'route':
+                        selectedRole == "Driver"
+                            ? routeController.text.trim()
+                            : "",
+
+                        'licenseNumber':
+                        selectedRole == "Driver"
+                            ? licenseController.text.trim()
+                            : "",
+
+                        'childName':
+                        selectedRole == "Parent"
+                            ? childNameController.text.trim()
+                            : "",
+
+                        'childClass':
+                        selectedRole == "Parent"
+                            ? childClassController.text.trim()
+                            : "",
                       });
 
                       if (selectedRole == "Parent") {
@@ -537,11 +817,11 @@ class _SignupScreenState
                       ),
                     ),
                   ),
-                ],
+                  ],
               ),
             ],
-          ),
         ),
+      ),
       ),
     );
   }

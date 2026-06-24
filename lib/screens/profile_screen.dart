@@ -13,6 +13,14 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState
     extends State<ProfileScreen> {
 
+  String phone = "";
+  String childName = "";
+  String childClass = "";
+  String vanNumber = "";
+  String licenseNumber = "";
+  String route = "";
+  String role = "";
+
   String userName = "";
   String userEmail = "";
 
@@ -41,6 +49,27 @@ class _ProfileScreenState
 
         setState(() {
 
+          phone =
+              doc['phone'] ?? "";
+
+          childName =
+              doc['childName'] ?? "";
+
+          childClass =
+              doc['childClass'] ?? "";
+
+          vanNumber =
+              doc['vanNumber'] ?? "";
+
+          licenseNumber =
+              doc['licenseNumber'] ?? "";
+
+          route =
+              doc['route'] ?? "";
+
+          role =
+              doc['role'] ?? "";
+
           userName =
           doc['name'];
 
@@ -57,25 +86,67 @@ class _ProfileScreenState
     return Scaffold(
 
       appBar: AppBar(
-        title: const Text("Profile"),
+        backgroundColor: Colors.black,
+        elevation: 0,
+
+        title: const Text(
+          "Profile",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
 
       body: Padding(
 
         padding: const EdgeInsets.all(20),
 
-        child: Column(
+        child: Container(
+
+          padding: const EdgeInsets.all(24),
+
+          decoration: BoxDecoration(
+
+            color: Colors.white,
+
+            borderRadius: BorderRadius.circular(24),
+
+            boxShadow: [
+
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 10,
+              ),
+            ],
+          ),
+
+          child: Column(
 
           crossAxisAlignment:
           CrossAxisAlignment.start,
 
           children: [
 
-            const CircleAvatar(
-              radius: 40,
-              child: Icon(
-                Icons.person,
-                size: 40,
+            Container(
+
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.black,
+                  width: 3,
+                ),
+              ),
+
+              child: const CircleAvatar(
+                radius: 45,
+                backgroundColor: Colors.black,
+
+                child: Icon(
+                  Icons.person,
+                  color: Colors.white,
+                  size: 45,
+                ),
               ),
             ),
 
@@ -101,15 +172,32 @@ class _ProfileScreenState
               ),
             ),
 
-            const Text(
-              "Van Number: Van 01",
+            const SizedBox(height: 12),
+
+            Text(
+                role == "Driver"
+                    ? "Van Number: $vanNumber"
+                    : "Child Name: $childName"
             ),
 
+            const SizedBox(height: 12),
+
+            Text(
+                "Phone: $phone",
+            ),
             const SizedBox(height: 10),
 
-            const Text(
-              "Phone: +91 9876543210",
+            Text(
+              role == "Driver"
+                  ? "Route: $route"
+                  : "Class: $childClass",
             ),
+            const SizedBox(height: 10),
+
+            if (role == "Driver")
+              Text(
+                "License: $licenseNumber",
+              ),
 
             const SizedBox(height: 30),
 
@@ -117,7 +205,20 @@ class _ProfileScreenState
 
               width: double.infinity,
 
-              child: ElevatedButton(
+              child: ElevatedButton.icon(
+
+                style: ElevatedButton.styleFrom(
+
+                  backgroundColor: Colors.black,
+
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 16,
+                  ),
+
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                ),
 
                 onPressed: () async {
 
@@ -127,13 +228,25 @@ class _ProfileScreenState
                   Navigator.pop(context);
                 },
 
-                child: const Text(
+                icon: const Icon(
+                  Icons.logout,
+                  color: Colors.white,
+                ),
+
+                label: const Text(
+
                   "Logout",
+
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
                 ),
               ),
             ),
           ],
         ),
+      ),
       ),
     );
   }

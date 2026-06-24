@@ -64,12 +64,19 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
         .snapshots()
         .listen((snapshot) async {
 
+      print("Firestore Triggered");
+
       if (snapshot.exists) {
 
         final data = snapshot.data();
 
-        double lat = data?['lat'];
-        double lng = data?['lng'];
+        print(data);
+
+        double lat =
+        (data?['lat'] ?? 0).toDouble();
+
+        double lng =
+        (data?['lng'] ?? 0).toDouble();
 
         List<Placemark> placemarks =
         await placemarkFromCoordinates(
@@ -83,13 +90,14 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
               placemarks.first.locality ??
                   "Unknown";
         });
+
+        print(selectedLocation);
       }
     });
   }
   int currentIndex = 0;
 
-
-  String selectedLocation = "MMU Road, Mullana";
+  String selectedLocation = "Fetching live location...";
 
   @override
   Widget build(BuildContext context) {
